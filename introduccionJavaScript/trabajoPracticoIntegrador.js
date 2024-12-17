@@ -99,9 +99,6 @@ let libros = [
     }
 ];
 
-console.log(libros); //Comprobamos el array de libros.
-
-
 //Creamos el array de usuarios con let
 let usuarios = [
     {
@@ -135,9 +132,6 @@ let usuarios = [
         librosPrestados: []
     }
 ];
-
-console.log(usuarios); //Comprobamos el array de usuarios
-
 
 // Punto 2: Funciones de Gestión de Libros-------------------------------------------------------------------------------------------------------------------------------------------
 // a)	Implementar una función agregarLibro(id, titulo, autor, anio, genero) que agregue un nuevo libro al array libros.
@@ -324,39 +318,36 @@ function prestarLibro(idLibro, idUsuario) {
 
 // b) Funcion para devolver un libro
 function devolverLibro(idLibro, idUsuario) {
-    //Buscamos al usuario en el array de usuarios mediante su ID
+    // Buscamos el usuario por ID
     let usuario = usuarios.find(usuario => usuario.id === idUsuario);
     if (!usuario) {
-        //Si el usuario no existe, mostramos un mensaje y terminamos la funcion, regresando al menu principal
         console.log("No se encontro ningun usuario con el ID proporcionado.");
         return;
     }
 
-    //Verificamos si el libro está en la lista de libros prestados al usuario
+    // Verificamos si el libro esta en la lista de libros prestados del usuario
     let indiceLibroPrestado = usuario.librosPrestados.indexOf(idLibro);
     if (indiceLibroPrestado === -1) {
-        //Si el libro no está en la lista de libros prestados, mostramos un mensaje y terminamos la funcion, regresando al menu principal
         console.log("El libro con ID " + idLibro + " no fue prestado al usuario.");
         return;
     }
 
-    //Buscamos el libro en el array de libros por su ID
+    // Buscamos el libro en el array de libros
     let libro = libros.find(libro => libro.id === idLibro);
-    if (libro) {
-        //Si el libro no existe, mostramos un mensaje y terminamos la funcion, regresando al menu principal
+    if (!libro) {
         console.log("No se encontro ningun libro con este ID.");
         return;
     }
 
-    //Marcamos el libro como disponible nuevamente
+    // Marcamos el libro como disponible
     libro.disponible = true;
-    //Eliminamos el ID del libro de la lista de libros prestados por el usuario
+
+    // Eliminamos el ID del libro de la lista de libros prestados del usuario
     usuario.librosPrestados.splice(indiceLibroPrestado, 1);
 
-    //Confirmamos que la devolución se realizó correctamente
-    console.log("Devolucion realizada. Usuario: " + usuario.nombre + ", Libro: " + libro.titulo);
+    // Mensaje de confirmacion
+    console.log("Devolucion realizada con exito. Usuario: " + usuario.nombre + ", Libro: " + libro.titulo);
 }
-
 
 //Punto 5: Sistema de Préstamos------------------------------------------------------------------------------------------------------------------------------------------------------
 // a) Crear una función generarReporteLibros() que utilice métodos avanzados de arrays (.map(), .filter(), .reduce()) para generar un reporte con la siguiente información:
@@ -415,22 +406,21 @@ function generarReporteLibros() {
 // Implementar una función librosConPalabrasEnTitulo() que identifique y muestre todos los libros cuyo título contiene más de una palabra (no títulos que contengan números ni otros caracteres). La función debe devolver un array con los títulos de esos libros y mostrarlo en la consola. 
 // En este punto además de colocar los métodos, tendrán que pensar muy bien la forma de filtrar para que solo sean letras. Piensen muy bien su lógica. (no permitiendo el método (…) o spread operator como fué mencionado en clase)
 
-
 function librosConPalabrasEnTitulo() {
-    //Usamos .filter() para recorrer todos los libros y filtrar aquellos cuyos titulos cumplen con los requisitos
-    let librosFiltrados = libros.filter(libro => {
-        let palabras = libro.titulo.split(" "); //Usamos el metodo .split() para separar el titulo por espacios y obtener cada palabra como un elemento del array para mayor conrol
-        if (palabras.length <= 1) return false; //Comprobamos si tiene mas de una palabra. Si no es asi, descartamos el titulo.
-        //Usando el metodo .every() en el array de palabras asegurando que cada palabra contenga solo letras (sin numeros ni caracteres especiales).
- return palabras.every(palabra => /^[a-zA-Z]+ $/ .test(palabra)); //Hago uso de la expresion regex, en donde:  ^: Comienza la palabra ; [a-zA-Z]: Acepta solo letras (mayúsculas y minúsculas) ; +: Permite una o más letras ; $: Finaliza la palabra.
+    const librosFiltrados = libros.filter(libro => {
+        // Limpiamos el titulo y lo dividimos en palabras
+        const palabras = libro.titulo.trim().split(" ").filter(palabra => palabra !== "");
+
+        // Verificamos que tenga mas de una palabra y que todas las palabras contengan solo letras
+        if (palabras.length <= 1) return false;
+        return palabras.every(palabra => /^[a-zA-Z]+$/.test(palabra));
     });
 
-    //Extraemos solo los titulos de los libros filtrados usando .map()
-    let titulosFiltrados = librosFiltrados.map(libro => libro.titulo);
+    // Extraemos los titulos de los libros filtrados
+    const titulosFiltrados = librosFiltrados.map(libro => libro.titulo);
 
-    //Mostramos el resultado en la consola
+    // Mostramos el resultado
     console.log("Libros con mas de una palabra en el titulo (solo letras):", titulosFiltrados);
-    //Devolvemos el array de títulos que cumplen con los criterios mencionados
     return titulosFiltrados;
 }
 
@@ -455,7 +445,6 @@ function calcularEstadisticas() {
     anios.forEach(anio => {
         frecuenciaAnios[anio] = (frecuenciaAnios[anio] || 0) + 1;//Sumamos el contador de cada año en el array
     });
-
     let anioMasFrecuente = null; //Se comineza por el año más frecuente
     let maxFrecuencia = 0; //Se comienza por la máxima frecuencia en 0
     for (let anio in frecuenciaAnios) {
@@ -466,21 +455,16 @@ function calcularEstadisticas() {
     }
 
     // c. Calcular la diferencia en años entre el libro más antiguo y el más reciente
-    let anioMasAntiguo = anios[0]; //Iniciamos con los valores del año más antiguo y el más reciente con el primer elemento
-    let anioMasReciente = anios[0];
-    for (let i = 1; i < anios.length; i++) { // Usamos un bucle para comparar cada año con los valores actuales
-        if (anios[i] < anioMasAntiguo) anioMasAntiguo = anios[i]; // De ser necesario, actualizamos el más antiguo 
-        if (anios[i] > anioMasReciente) anioMasReciente = anios[i]; // De ser necesario, actualizamos el más reciente 
-    }
-    let diferenciaAnios = anioMasReciente - anioMasAntiguo; //Calculamos la diferencia entre los años
+    let anioMasAntiguo = Math.min(...anios);//Iniciamos con los valores del año más antiguo y el más reciente con el primer elemento
+    let anioMasReciente = Math.max(...anios);
+    const diferenciaAnios = anioMasReciente - anioMasAntiguo;
 
-    //Retornamos las estadísticas
+    // Mostramos las estadisticas
+    console.log("Promedio de anios de publicacion: " + promedio);
+    console.log("Anio mas frecuente: " + anioMasFrecuente);
+    console.log("Diferencia entre libro mas antiguo y mas reciente: " + diferenciaAnios);
     return { promedio, anioMasFrecuente, diferenciaAnios };
 }
-
-//Prueba de la función
-let estadisticas = calcularEstadisticas();
-console.log(estadisticas);
 
 // Punto 8: Manejo de Cadenas--------------------------------------------------------------------------------------------------------------------------------------------------------
 // a)	Crear una función normalizarDatos() que utilice métodos de strings para:
@@ -489,26 +473,15 @@ console.log(estadisticas);
 // Formatear los emails de los usuarios a minúsculas
 
 function normalizarDatos() {
-    //Recorremos el array de libros
     libros.forEach(libro => {
-        libro.titulo = libro.titulo.toUpperCase(); //Convertimos el título del libro a mayúsculas
-        console.log("Título normalizado: " + libro.titulo); //Mostramos el resultado en la consola
-
-        //Eliminamos los espacios en blanco al inicio y final del nombre del autor
-        libro.autor = libro.autor.trim();
-        console.log("Autor normalizado: " + libro.autor); //Mostramos el resultado en la consola
+        libro.titulo = libro.titulo.toUpperCase(); // Convertimos el título a mayúsculas
+        libro.autor = libro.autor.trim(); // Eliminamos espacios en blanco al inicio y final del nombre del autor
     });
 
-    //Recorremos el array de usuarios
     usuarios.forEach(usuario => {
-        //Convertimos el email del usuario a minúsculas
-        usuario.email = usuario.email.toLowerCase();
-        console.log("Email normalizado: " + usuario.email); // Mostramos el resultado en la consola
+        usuario.email = usuario.email.toLowerCase(); // Convertimos los emails a minúsculas
     });
 }
-
-//Ejemplo de prueba
-normalizarDatos();
 
 // Punto 9: Interfaz de Usuario por Consola------------------------------------------------------------------------------------------------------------------------------------------
 // a)	Implementar una función menuPrincipal() que muestre un menú de opciones al usuario y permita interactuar con el sistema utilizando prompt().
@@ -517,7 +490,6 @@ normalizarDatos();
 
 function menuPrincipal() {
     let opcion;
-
     do {
         console.log("Bienvenido! Elija una de las siguientes opciones:");
         console.log("1. Agregar un libro");
@@ -532,27 +504,27 @@ function menuPrincipal() {
         console.log("10. Devolver un libro");
         console.log("11. Generar reporte de libros");
         console.log("12. Normalizar datos");
-        console.log("13. Salir");
+        console.log("13. Buscar libros con varias palabras en el titulo");
+        console.log("14. Calcular estadisticas de los libros");
+        console.log("15. Salir");
 
-        opcion = parseInt(prompt("Ingrese una opción: ")); //Solicitamos la opción al usuario
-        
-        //Validación de entrada
-        if (isNaN(opcion) || opcion < 1 || opcion > 13) {
-            console.log("Por favor, ingrese una opción válida.");
-            continue; // Volvemos al inicio del bucle si la opción es inválida
+        opcion = parseInt(prompt("Ingrese una opcion: "));
+        if (isNaN(opcion) || opcion < 1 || opcion > 15) {
+            console.log("Por favor, ingrese una opcion valida.");
+            continue;
         }
 
-        switch (opcion) { //Procesamos la opción ingresada usando switch
+        switch (opcion) {
             case 1:
                 let id = parseInt(prompt("Ingrese el ID del libro: "));
-                let titulo = prompt("Ingrese el título del libro: ");
+                let titulo = prompt("Ingrese el titulo del libro: ");
                 let autor = prompt("Ingrese el autor del libro: ");
-                let anio = parseInt(prompt("Ingrese el año de publicación: "));
-                let genero = prompt("Ingrese el género del libro: ");
+                let anio = parseInt(prompt("Ingrese el anio de publicacion: "));
+                let genero = prompt("Ingrese el genero del libro: ");
                 agregarLibro(id, titulo, autor, anio, genero);
                 break;
             case 2:
-                let criterio = prompt("Ingrese el criterio de búsqueda (titulo, autor, anio, genero): ");
+                let criterio = prompt("Ingrese el criterio de busqueda (titulo, autor, anio, genero): ");
                 let valor = prompt("Ingrese el valor a buscar: ");
                 buscarLibro(criterio, valor);
                 break;
@@ -599,15 +571,19 @@ function menuPrincipal() {
                 console.log("Datos normalizados correctamente.");
                 break;
             case 13:
+                librosConPalabrasEnTitulo();
+                break;
+            case 14:
+                calcularEstadisticas();
+                break;
+            case 15:
                 console.log("Hasta luego!");
                 break;
-            default:
-                console.log("Opción no válida.");
         }
-    } while (opcion !== 13); //El menú se repetirá hasta que se elija la opción 13 (Salir)
+    } while (opcion !== 15);
 }
 
-//Inicia el programa
+// Ejecutar el menu principal
 menuPrincipal();
 
 
@@ -617,4 +593,11 @@ menuPrincipal();
 
 
 
-//Ultimas correcciones: not "!" , Comentarios, pasar los const a let, chequear las formulas math., correccion en implementacion forEach en busqueda de libros.
+//Ultimas correcciones: 
+// not "!" 
+// Comentarios
+// pasar los const a let
+// chequear las formulas math.
+// correccion en implementacion forEach en busqueda de libros.
+// eliminación de console.log s innecesarias que imprimían arrays en el menú principal, 
+// invocación de opciones 13 y 14 en el menú principal.
